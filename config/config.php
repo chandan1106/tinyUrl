@@ -9,7 +9,7 @@ define('DB_NAME', 'tinyurl_db');
 define('BASE_URL', 'http://' . $_SERVER['HTTP_HOST']);
 
 // Firebase configuration
-define('FIREBASE_API_KEY', 'AIzaSyBlEYgqEmxapexLxkZEHDvxxajpTpgPrfA');
+define('FIREBASE_API_KEY', '');
 
 // Connect to MySQL database
 $conn = null;
