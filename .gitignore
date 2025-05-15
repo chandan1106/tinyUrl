@@ -1,0 +1,19 @@
+# Environment variables
+.env
+
+# User-specific files
+*.log
+*.sqlite
+
+# Runtime data
+tmp/
+logs/
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-*
+
+# OS files
+.DS_Store
+Thumbs.db

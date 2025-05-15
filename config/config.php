@@ -1,15 +1,27 @@
 <?php
+// Load environment variables
+$envFile = __DIR__ . '/../.env';
+if (file_exists($envFile)) {
+    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos($line, '=') !== false && strpos($line, '#') !== 0) {
+            list($key, $value) = explode('=', $line, 2);
+            $_ENV[trim($key)] = trim($value);
+        }
+    }
+}
+
 // Database configuration
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'tinyurl_db');
+define('DB_HOST', $_ENV['DB_HOST'] ?? 'localhost');
+define('DB_USER', $_ENV['DB_USER'] ?? 'root');
+define('DB_PASS', $_ENV['DB_PASS'] ?? '');
+define('DB_NAME', $_ENV['DB_NAME'] ?? 'tinyurl_db');
 
 // Base URL for shortened URLs
 define('BASE_URL', 'http://' . $_SERVER['HTTP_HOST']);
 
 // Firebase configuration
-define('FIREBASE_API_KEY', '');
+define('FIREBASE_API_KEY', $_ENV['FIREBASE_API_KEY'] ?? '');
 
 // Connect to MySQL database
 $conn = null;
@@ -40,6 +52,8 @@ try {
             id INT AUTO_INCREMENT PRIMARY KEY,
             firebase_uid VARCHAR(128) NOT NULL UNIQUE,
             email VARCHAR(255) NOT NULL,
+            display_name VARCHAR(255) DEFAULT '',
+            photo_url TEXT,
             created_at DATETIME NOT NULL,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             INDEX (firebase_uid),

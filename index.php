@@ -224,27 +224,25 @@ if ($isLoggedIn) {
     </div>
 
     <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "",
-            authDomain: "",
-            projectId: "",
-            storageBucket: "",
-            messagingSenderId: "",
-            appId: "",
-            measurementId: ""
-        };
-        
-        // Initialize Firebase with error handling
-        try {
-            firebase.initializeApp(firebaseConfig);
-            const analytics = firebase.analytics();
-            console.log("Firebase initialized successfully");
-        } catch (error) {
-            console.error("Firebase initialization error:", error);
-            // Show a user-friendly error message
-            $('#authError').text("Firebase initialization failed. Please check your configuration.").show();
-        }
+        // Load Firebase configuration from server
+        fetch('get_firebase_config.php')
+            .then(response => response.json())
+            .then(firebaseConfig => {
+                // Initialize Firebase with error handling
+                try {
+                    firebase.initializeApp(firebaseConfig);
+                    const analytics = firebase.analytics();
+                    console.log("Firebase initialized successfully");
+                } catch (error) {
+                    console.error("Firebase initialization error:", error);
+                    // Show a user-friendly error message
+                    $('#authError').text("Firebase initialization failed. Please check your configuration.").show();
+                }
+            })
+            .catch(error => {
+                console.error("Failed to load Firebase config:", error);
+                $('#authError').text("Failed to load Firebase configuration.").show();
+            });
         
         // Auth modal functionality
         let authMode = 'login';

@@ -4,7 +4,7 @@ A URL shortening web application with user authentication using Firebase, MySQL,
 
 ## Features
 
-- User authentication with Firebase
+- User authentication with Firebase (Email/Password and Google Sign-In)
 - URL shortening with custom short codes
 - URL click tracking and statistics
 - API for programmatic access
@@ -19,39 +19,40 @@ A URL shortening web application with user authentication using Firebase, MySQL,
 - Apache web server with mod_rewrite enabled
 - Firebase account
 
-### Database Setup
+### Installation
 
-1. Create a MySQL database and import the schema:
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/tinyUrl.git
+cd tinyUrl
+```
 
+2. Copy the environment example file and update with your credentials:
+```bash
+cp .env-example .env
+```
+
+3. Edit the `.env` file with your database and Firebase credentials:
+```
+DB_HOST=localhost
+DB_USER=your_db_user
+DB_PASS=your_db_password
+DB_NAME=tinyurl_db
+FIREBASE_API_KEY=your_firebase_api_key
+FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+FIREBASE_PROJECT_ID=your-project-id
+FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
+FIREBASE_APP_ID=your-app-id
+FIREBASE_MEASUREMENT_ID=your-measurement-id
+```
+
+4. Import the database schema:
 ```bash
 mysql -u username -p < setup.sql
 ```
 
-### Firebase Setup
-
-1. Create a new Firebase project at [https://console.firebase.google.com/](https://console.firebase.google.com/)
-2. Enable Email/Password authentication in the Firebase console
-3. Get your Firebase configuration (apiKey, authDomain, etc.)
-4. Update the Firebase configuration in `index.php`
-
-### Configuration
-
-1. Update the database connection settings in `config/config.php`:
-
-```php
-define('DB_HOST', 'your_db_host');
-define('DB_USER', 'your_db_user');
-define('DB_PASS', 'your_db_password');
-define('DB_NAME', 'tinyurl_db');
-```
-
-2. Update the Firebase API key in `config/config.php`:
-
-```php
-define('FIREBASE_API_KEY', 'your_firebase_api_key');
-```
-
-3. Make sure the `BASE_URL` constant in `config/config.php` is set correctly for your environment.
+5. Configure your web server to point to the project directory and ensure mod_rewrite is enabled.
 
 ### Web Server Configuration
 
@@ -59,100 +60,43 @@ Make sure Apache's mod_rewrite is enabled and AllowOverride is set to All in you
 
 ## API Documentation
 
-### Shorten URL
+### Authentication
 
-**Endpoint:** `/api/shorten.php`
+All API requests require an API key. Include your API key in the request body as `api_key`.
+
+### Endpoints
+
+#### 1. Shorten URL
+
+**Endpoint:** `/api/shorten`
 **Method:** POST
 **Parameters:**
 - `api_key`: Your API key
 - `url`: The URL to shorten
 
-**Example Request:**
-```json
-{
-  "api_key": "your_api_key",
-  "url": "https://example.com"
-}
-```
+#### 2. Get URL Statistics
 
-**Example Response:**
-```json
-{
-  "success": true,
-  "url_id": 123,
-  "original_url": "https://example.com",
-  "short_url": "http://yourdomain.com/abc123",
-  "short_code": "abc123"
-}
-```
-
-### Get URL Statistics
-
-**Endpoint:** `/api/stats.php`
+**Endpoint:** `/api/stats`
 **Method:** POST
 **Parameters:**
 - `api_key`: Your API key
 - `short_code`: The short code of the URL
 
-**Example Request:**
-```json
-{
-  "api_key": "your_api_key",
-  "short_code": "abc123"
-}
-```
+#### 3. List URLs
 
-**Example Response:**
-```json
-{
-  "success": true,
-  "url_id": 123,
-  "original_url": "https://example.com",
-  "short_url": "http://yourdomain.com/abc123",
-  "short_code": "abc123",
-  "created_at": "2023-01-01 12:00:00",
-  "click_count": 42
-}
-```
-
-### List URLs
-
-**Endpoint:** `/api/list.php`
+**Endpoint:** `/api/list`
 **Method:** POST
 **Parameters:**
 - `api_key`: Your API key
 - `limit`: (Optional) Number of URLs to return (default: 10)
 - `offset`: (Optional) Offset for pagination (default: 0)
 
-**Example Request:**
-```json
-{
-  "api_key": "your_api_key",
-  "limit": 10,
-  "offset": 0
-}
-```
+## Security Notes
 
-**Example Response:**
-```json
-{
-  "success": true,
-  "total": 42,
-  "limit": 10,
-  "offset": 0,
-  "urls": [
-    {
-      "id": 123,
-      "original_url": "https://example.com",
-      "short_url": "http://yourdomain.com/abc123",
-      "short_code": "abc123",
-      "created_at": "2023-01-01 12:00:00",
-      "click_count": 42
-    },
-    // More URLs...
-  ]
-}
-```
+- Never commit the `.env` file to version control
+- Keep your API keys and credentials private
+- For production, set environment variables on your server instead of using a .env file
+- Regularly update your dependencies and Firebase SDK
 
 ## License
 
