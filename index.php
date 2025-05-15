@@ -226,13 +226,13 @@ if ($isLoggedIn) {
     <script>
         // Firebase configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyBlEYgqEmxapexLxkZEHDvxxajpTpgPrfA",
-            authDomain: "tinyurl-ac3ce.firebaseapp.com",
-            projectId: "tinyurl-ac3ce",
-            storageBucket: "tinyurl-ac3ce.firebasestorage.app",
-            messagingSenderId: "447727236633",
-            appId: "1:447727236633:web:2e6a14c56545dcd5fb1c88",
-            measurementId: "G-9V706YWY0H"
+            apiKey: "",
+            authDomain: "",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: "",
+            measurementId: ""
         };
         
         // Initialize Firebase with error handling
