@@ -73,8 +73,9 @@ if ($isLoggedIn) {
     <title>TinyURL - URL Shortener</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.7.3/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.7.3/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.7.3/firebase-analytics-compat.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen">
     <nav class="bg-blue-600 text-white p-4">
@@ -82,8 +83,15 @@ if ($isLoggedIn) {
             <a href="/" class="text-2xl font-bold">TinyURL</a>
             <div>
                 <?php if ($isLoggedIn): ?>
-                    <span class="mr-4">Welcome, <?php echo htmlspecialchars($_SESSION['email']); ?></span>
-                    <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded">Logout</button>
+                    <div class="flex items-center">
+                        <?php if (!empty($_SESSION['photo_url'])): ?>
+                            <img src="<?php echo htmlspecialchars($_SESSION['photo_url']); ?>" alt="Profile" class="w-8 h-8 rounded-full mr-2">
+                        <?php endif; ?>
+                        <span class="mr-4">
+                            <?php echo !empty($_SESSION['display_name']) ? htmlspecialchars($_SESSION['display_name']) : htmlspecialchars($_SESSION['email']); ?>
+                        </span>
+                        <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded">Logout</button>
+                    </div>
                 <?php else: ?>
                     <button id="loginBtn" class="bg-blue-500 hover:bg-blue-700 px-4 py-2 rounded mr-2">Login</button>
                     <button id="registerBtn" class="bg-green-500 hover:bg-green-700 px-4 py-2 rounded">Register</button>
@@ -197,6 +205,14 @@ if ($isLoggedIn) {
                 </div>
                 <button type="submit" id="authSubmitBtn" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Login</button>
             </form>
+            
+            <div class="mt-4">
+                <button id="googleSignInBtn" class="w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded flex items-center justify-center hover:bg-gray-100">
+                    <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo" class="w-5 h-5 mr-2">
+                    Sign in with Google
+                </button>
+            </div>
+            
             <div class="mt-4 text-center">
                 <p id="switchAuthMode" class="text-blue-600 hover:underline cursor-pointer">
                     Don't have an account? Register
@@ -208,17 +224,19 @@ if ($isLoggedIn) {
     <script>
         // Firebase configuration
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyBlEYgqEmxapexLxkZEHDvxxajpTpgPrfA",
+            authDomain: "tinyurl-ac3ce.firebaseapp.com",
+            projectId: "tinyurl-ac3ce",
+            storageBucket: "tinyurl-ac3ce.firebasestorage.app",
+            messagingSenderId: "447727236633",
+            appId: "1:447727236633:web:2e6a14c56545dcd5fb1c88",
+            measurementId: "G-9V706YWY0H"
         };
         
         // Initialize Firebase with error handling
         try {
             firebase.initializeApp(firebaseConfig);
+            const analytics = firebase.analytics();
             console.log("Firebase initialized successfully");
         } catch (error) {
             console.error("Firebase initialization error:", error);
@@ -300,6 +318,42 @@ if ($isLoggedIn) {
                         $('#authError').text(error.message).show();
                     });
             }
+        });
+        
+        // Google Sign-In
+        $('#googleSignInBtn').click(function() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            firebase.auth().signInWithPopup(provider)
+                .then((result) => {
+                    // Get the Google access token
+                    const credential = result.credential;
+                    const token = credential.accessToken;
+                    const user = result.user;
+                    
+                    // Get Firebase ID token to send to backend
+                    return user.getIdToken();
+                })
+                .then((idToken) => {
+                    // Send token to backend for session creation
+                    $.ajax({
+                        url: 'auth/google_login.php',
+                        type: 'POST',
+                        data: { idToken },
+                        success: function() {
+                            window.location.reload();
+                        },
+                        error: function(xhr) {
+                            $('#authError').text(xhr.responseText || 'Google login failed').show();
+                        }
+                    });
+                })
+                .catch((error) => {
+                    // Handle errors
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    $('#authError').text(errorMessage).show();
+                    console.error('Google sign-in error:', error);
+                });
         });
         
         // Handle logout

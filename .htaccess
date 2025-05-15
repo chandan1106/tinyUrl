@@ -1,0 +1,27 @@
+RewriteEngine On
+
+# Redirect short URLs to redirect.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([a-zA-Z0-9]+)$ redirect.php?code=$1 [L,QSA]
+
+# Prevent direct access to .php files in the includes directory
+RewriteRule ^includes/ - [F,L]
+
+# Prevent direct access to config directory
+RewriteRule ^config/ - [F,L]
+
+# PHP settings
+php_flag display_errors off
+php_value error_reporting 0
+
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Disable directory listing
+Options -Indexes

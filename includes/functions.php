@@ -101,13 +101,23 @@ function getUserByFirebaseUid($firebaseUid) {
  * 
  * @param string $firebaseUid Firebase UID
  * @param string $email User email
+ * @param string $displayName User display name (optional)
+ * @param string $photoUrl User photo URL (optional)
  * @return int|bool User ID if successful, false otherwise
  */
-function createUser($firebaseUid, $email) {
+function createUser($firebaseUid, $email, $displayName = '', $photoUrl = '') {
     global $conn;
     
-    $stmt = $conn->prepare("INSERT INTO users (firebase_uid, email, created_at) VALUES (?, ?, NOW())");
-    $stmt->bind_param("ss", $firebaseUid, $email);
+    // Check if users table has the necessary columns
+    $result = $conn->query("SHOW COLUMNS FROM users LIKE 'display_name'");
+    if ($result->num_rows == 0) {
+        // Add columns if they don't exist
+        $conn->query("ALTER TABLE users ADD display_name VARCHAR(255) DEFAULT ''");
+        $conn->query("ALTER TABLE users ADD photo_url TEXT");
+    }
+    
+    $stmt = $conn->prepare("INSERT INTO users (firebase_uid, email, display_name, photo_url, created_at) VALUES (?, ?, ?, ?, NOW())");
+    $stmt->bind_param("ssss", $firebaseUid, $email, $displayName, $photoUrl);
     
     if ($stmt->execute()) {
         $userId = $stmt->insert_id;

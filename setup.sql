@@ -1,3 +1,4 @@
+-- Create database
 
 
 -- Create users table
@@ -5,6 +6,8 @@ CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     firebase_uid VARCHAR(128) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL,
+    display_name VARCHAR(255) DEFAULT '',
+    photo_url TEXT,
     created_at DATETIME NOT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX (firebase_uid),
