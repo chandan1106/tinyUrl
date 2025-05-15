@@ -5,7 +5,7 @@ require_once 'includes/functions.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: index.php');
+    header('Location: index');
     exit;
 }
 
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['key_id']) && isset($_
         $stmt->execute();
         $stmt->close();
         
-        header('Location: profile.php');
+        header('Location: profile');
         exit;
     }
 }
@@ -71,8 +71,10 @@ $stmt->close();
         <div class="container mx-auto flex justify-between items-center">
             <a href="/" class="text-2xl font-bold">TinyURL</a>
             <div>
-                <a href="index.php" class="mr-4">Home</a>
-                <a href="profile.php" class="mr-4 font-bold">Profile</a>
+                <a href="index" class="mr-4">Home</a>
+                <a href="profile" class="mr-4 font-bold">Profile</a>
+                <a href="api_keys" class="mr-4">API Keys</a>
+                <a href="api_docs" class="mr-4">API Docs</a>
                 <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded">Logout</button>
             </div>
         </div>
@@ -97,13 +99,13 @@ $stmt->close();
         <div class="bg-white p-6 rounded-lg shadow-md">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold">API Keys</h2>
-                <button id="generateKeyBtn" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded text-white">
-                    Generate New Key
-                </button>
+                <a href="api_keys" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                    Manage API Keys
+                </a>
             </div>
             
             <?php if (empty($apiKeys)): ?>
-                <p class="text-gray-500">You don't have any API keys yet.</p>
+                <p class="text-gray-500">You don't have any API keys yet. Generate one to get started.</p>
             <?php else: ?>
                 <div class="overflow-x-auto">
                     <table class="min-w-full bg-white">
@@ -112,11 +114,10 @@ $stmt->close();
                                 <th class="py-2 px-4 border-b text-left">API Key</th>
                                 <th class="py-2 px-4 border-b text-left">Status</th>
                                 <th class="py-2 px-4 border-b text-left">Created</th>
-                                <th class="py-2 px-4 border-b text-left">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($apiKeys as $key): ?>
+                            <?php foreach (array_slice($apiKeys, 0, 3) as $key): ?>
                                 <tr>
                                     <td class="py-2 px-4 border-b font-mono">
                                         <?php echo htmlspecialchars($key['api_key']); ?>
@@ -131,44 +132,17 @@ $stmt->close();
                                     <td class="py-2 px-4 border-b">
                                         <?php echo date('M j, Y', strtotime($key['created_at'])); ?>
                                     </td>
-                                    <td class="py-2 px-4 border-b">
-                                        <form method="POST" action="" class="inline">
-                                            <input type="hidden" name="key_id" value="<?php echo $key['id']; ?>">
-                                            <?php if ($key['active']): ?>
-                                                <input type="hidden" name="action" value="deactivate">
-                                                <button type="submit" class="text-red-600 hover:underline">Deactivate</button>
-                                            <?php else: ?>
-                                                <input type="hidden" name="action" value="activate">
-                                                <button type="submit" class="text-green-600 hover:underline">Activate</button>
-                                            <?php endif; ?>
-                                        </form>
-                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
+                <?php if (count($apiKeys) > 3): ?>
+                    <div class="mt-4 text-center">
+                        <a href="api_keys" class="text-blue-600 hover:underline">View all API keys</a>
+                    </div>
+                <?php endif; ?>
             <?php endif; ?>
-            
-            <div class="mt-6">
-                <h3 class="text-xl font-bold mb-2">API Usage</h3>
-                <div class="bg-gray-100 p-4 rounded font-mono text-sm">
-                    <p class="mb-2">// Example API request to shorten URL</p>
-                    <pre class="overflow-x-auto">
-fetch('<?php echo BASE_URL; ?>/api/shorten.php', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-        api_key: 'YOUR_API_KEY',
-        url: 'https://example.com'
-    })
-})
-.then(response => response.json())
-.then(data => console.log(data));</pre>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -176,30 +150,10 @@ fetch('<?php echo BASE_URL; ?>/api/shorten.php', {
         // Handle logout
         $('#logoutBtn').click(function() {
             $.ajax({
-                url: 'auth/logout.php',
+                url: 'auth/logout',
                 type: 'POST',
                 success: function() {
-                    window.location.href = 'index.php';
-                }
-            });
-        });
-        
-        // Handle API key generation
-        $('#generateKeyBtn').click(function() {
-            $.ajax({
-                url: 'api/generate_key.php',
-                type: 'POST',
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        alert('New API key generated: ' + response.api_key);
-                        window.location.reload();
-                    } else {
-                        alert('Error: ' + response.error);
-                    }
-                },
-                error: function() {
-                    alert('Failed to generate API key. Please try again.');
+                    window.location.href = 'index';
                 }
             });
         });

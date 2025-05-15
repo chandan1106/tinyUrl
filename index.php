@@ -90,12 +90,14 @@ if ($isLoggedIn) {
                         <span class="mr-4">
                             <?php echo !empty($_SESSION['display_name']) ? htmlspecialchars($_SESSION['display_name']) : htmlspecialchars($_SESSION['email']); ?>
                         </span>
+                        <a href="profile" class="mr-4 hover:underline">Profile</a>
+                        <a href="api_keys" class="mr-4 hover:underline">API Keys</a>
                         <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded">Logout</button>
                     </div>
                 <?php else: ?>
                     <button id="loginBtn" class="bg-blue-500 hover:bg-blue-700 px-4 py-2 rounded mr-2">Login</button>
                     <button id="registerBtn" class="bg-green-500 hover:bg-green-700 px-4 py-2 rounded">Register</button>
-                    <a href="simple_login.php" class="bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded ml-2">Simple Login</a>
+                    <a href="simple_login" class="bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded ml-2">Simple Login</a>
                 <?php endif; ?>
             </div>
         </div>
@@ -281,7 +283,7 @@ if ($isLoggedIn) {
                     .then((idToken) => {
                         // Send token to backend for session creation
                         $.ajax({
-                            url: 'auth/login.php',
+                            url: 'auth/login',
                             type: 'POST',
                             data: { idToken },
                             success: function() {
@@ -303,7 +305,7 @@ if ($isLoggedIn) {
                     .then((idToken) => {
                         // Send token to backend for user creation and session
                         $.ajax({
-                            url: 'auth/register.php',
+                            url: 'auth/register',
                             type: 'POST',
                             data: { idToken },
                             success: function() {
@@ -336,7 +338,7 @@ if ($isLoggedIn) {
                 .then((idToken) => {
                     // Send token to backend for session creation
                     $.ajax({
-                        url: 'auth/google_login.php',
+                        url: 'auth/google_login',
                         type: 'POST',
                         data: { idToken },
                         success: function() {
@@ -360,7 +362,7 @@ if ($isLoggedIn) {
         $('#logoutBtn').click(function() {
             firebase.auth().signOut().then(() => {
                 $.ajax({
-                    url: 'auth/logout.php',
+                    url: 'auth/logout',
                     type: 'POST',
                     success: function() {
                         window.location.reload();
