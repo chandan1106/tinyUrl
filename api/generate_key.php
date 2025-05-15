@@ -7,11 +7,11 @@ require_once '../includes/functions.php';
 header('Content-Type: application/json');
 
 // Check if user is logged in
-/*if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
     echo json_encode(['error' => 'Unauthorized']);
     exit;
-}*/
+}
 
 $userId = $_SESSION['user_id'];
 
